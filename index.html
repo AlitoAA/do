@@ -314,9 +314,12 @@
           </div>
         </form>
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn-secondary" onclick="app.closeModal('modal-task-editor')">Cancel</button>
-        <button type="button" class="btn-primary" onclick="app.saveTaskEditorForm()">Save Task</button>
+      <div class="modal-footer" style="display: flex; justify-content: space-between;">
+        <button type="button" class="btn-secondary" id="task-edit-delete-btn" style="color: #f43f5e; border-color: rgba(244, 63, 94, 0.4); display: none;" onclick="app.deleteTaskFromEditor()">🗑️ Delete Task</button>
+        <div style="display: flex; gap: 10px; margin-left: auto;">
+          <button type="button" class="btn-secondary" onclick="app.closeModal('modal-task-editor')">Cancel</button>
+          <button type="button" class="btn-primary" onclick="app.saveTaskEditorForm()">Save Task</button>
+        </div>
       </div>
     </div>
   </div>
