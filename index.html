@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="calm" data-motion="normal">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>AuDHD Life Sanctuary — Personal Command Center &amp; RPG</title>
+  <meta name="description" content="A gentle, predictable, and rewarding executive function assistant designed specifically for AuDHD adults.">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- App Wrapper Container -->
+  <div id="app-container">
+
+    <!-- DESKTOP / DRAWER SIDEBAR -->
+    <aside class="app-sidebar" aria-label="Main Navigation">
+      <div class="sidebar-header">
+        <div class="brand-icon">🌟</div>
+        <div>
+          <div class="brand-title">Sanctuary</div>
+          <div class="brand-subtitle">AuDHD Life HUD</div>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="javascript:void(0)" class="nav-item active" data-view="dashboard" onclick="app.switchView('dashboard')">
+          <span>🏠</span>
+          <span>Today HUD</span>
+        </a>
+        <a href="javascript:void(0)" class="nav-item" data-view="tasks" onclick="app.switchView('tasks')">
+          <span>📋</span>
+          <span>All Tasks</span>
+        </a>
+        <a href="javascript:void(0)" class="nav-item" data-view="calendar" onclick="app.switchView('calendar')">
+          <span>📅</span>
+          <span>7-Day Planner</span>
+        </a>
+        <a href="javascript:void(0)" class="nav-item" data-view="projects" onclick="app.switchView('projects')">
+          <span>📁</span>
+          <span>Projects &amp; Routines</span>
+        </a>
+        <a href="javascript:void(0)" class="nav-item" data-view="journal" onclick="app.switchView('journal')">
+          <span>📓</span>
+          <span>Reflections</span>
+        </a>
+        <a href="javascript:void(0)" class="nav-item" data-view="skills" onclick="app.switchView('skills')">
+          <span>🎮</span>
+          <span>RPG &amp; Skills</span>
+        </a>
+        <a href="javascript:void(0)" class="nav-item" data-view="inbox" onclick="app.switchView('inbox')">
+          <span>🧠</span>
+          <span>Brain Dump &amp; Inbox</span>
+        </a>
+        <a href="javascript:void(0)" class="nav-item" data-view="settings" onclick="app.switchView('settings')">
+          <span>⚙️</span>
+          <span>Sensory Settings</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-badge-card" onclick="app.switchView('skills')" style="cursor: pointer;">
+          <div class="user-avatar" id="sidebar-user-avatar">🐱</div>
+          <div style="flex: 1; min-width: 0;">
+            <div class="user-info-name">Alex</div>
+            <div class="user-info-level" id="sidebar-level-text">Level 3 Explorer</div>
+          </div>
+          <span style="font-size: 0.8rem; color: var(--text-muted);">→</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN APP AREA -->
+    <main class="app-main">
+
+      <!-- TOP STICKY HEADER -->
+      <header class="app-header">
+        <div class="header-left">
+          <button class="mobile-menu-btn" onclick="document.querySelector('.app-sidebar').classList.toggle('open')" aria-label="Toggle Navigation Menu">
+            ☰
+          </button>
+          <div class="header-datetime">
+            <div class="header-date" id="header-current-date">Today</div>
+            <div class="header-greeting" id="header-current-greeting">Welcome in. One step at a time.</div>
+          </div>
+        </div>
+
+        <!-- Center: Quick NLP Add Bar -->
+        <div class="header-center" style="flex: 1; max-width: 480px;">
+          <div style="position: relative; width: 100%;">
+            <input type="text" id="global-quick-add-input" class="form-input" style="width: 100%; padding-left: 36px; padding-right: 70px; height: 38px; font-size: 0.85rem;" placeholder="Quick add: &quot;Water plants tomorrow at 10am #home !high&quot;" onkeydown="if(event.key==='Enter') app.submitQuickAdd()">
+            <span style="position: absolute; left: 12px; top: 10px; font-size: 0.85rem; color: var(--text-muted);">⚡</span>
+            <button class="btn-primary" style="position: absolute; right: 3px; top: 3px; bottom: 3px; padding: 0 10px; font-size: 0.78rem;" onclick="app.submitQuickAdd()">Add</button>
+          </div>
+        </div>
+
+        <!-- Right: Capacity Pill, Bare Minimum, & Quick Buttons -->
+        <div class="header-right">
+          <!-- Capacity Selector Button -->
+          <div class="capacity-selector-pill" onclick="app.openModal('modal-capacity-picker')" title="Adjust energy capacity mode">
+            <span id="header-capacity-label">⚡ Normal</span>
+            <span style="font-size: 0.7rem; color: var(--text-muted);">▼</span>
+          </div>
+
+          <!-- Bare Minimum Mode Toggle -->
+          <button class="bare-min-toggle" id="header-bare-min-btn" onclick="app.toggleBareMinimum()" title="Toggle ultra-simple bare minimum mode for low energy days">
+            <span>🪫</span>
+            <span>Bare Min</span>
+          </button>
+
+          <!-- New Task Modal Button -->
+          <button class="btn-primary" onclick="app.openTaskEditor()" title="Open full task creator">
+            <span>+</span>
+            <span style="display: inline-block;">Task</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- DYNAMIC VIEW CONTAINER -->
+      <div id="main-view-container">
+        <!-- Rendered dynamically by UIComponents -->
+      </div>
+    </main>
+  </div>
+
+  <!-- MOBILE BOTTOM NAVIGATION -->
+  <nav class="mobile-bottom-nav">
+    <a href="javascript:void(0)" class="mobile-nav-btn active" data-view="dashboard" onclick="app.switchView('dashboard')">
+      <span class="icon">🏠</span>
+      <span>Today</span>
+    </a>
+    <a href="javascript:void(0)" class="mobile-nav-btn" data-view="tasks" onclick="app.switchView('tasks')">
+      <span class="icon">📋</span>
+      <span>Tasks</span>
+    </a>
+    <a href="javascript:void(0)" class="mobile-nav-btn" data-view="inbox" onclick="app.switchView('inbox')">
+      <span class="icon">🧠</span>
+      <span>Dump</span>
+    </a>
+    <a href="javascript:void(0)" class="mobile-nav-btn" data-view="journal" onclick="app.switchView('journal')">
+      <span class="icon">📓</span>
+      <span>Journal</span>
+    </a>
+    <a href="javascript:void(0)" class="mobile-nav-btn" data-view="skills" onclick="app.switchView('skills')">
+      <span class="icon">🎮</span>
+      <span>RPG</span>
+    </a>
+  </nav>
+
+  <!-- ==================== FOCUS MODE HUD (Distraction-Free Fullscreen) ==================== -->
+  <div id="focus-modal-overlay">
+    <div class="focus-hud-container">
+      <div class="focus-hud-header">
+        <div class="body-double-presence">
+          <div class="double-pulse-circle"></div>
+          <span>Working alongside you... gentle focus</span>
+        </div>
+        <button class="btn-secondary" onclick="app.closeFocusMode()" style="font-size: 0.84rem;">
+          ✕ Exit Focus Mode
+        </button>
+      </div>
+
+      <div class="focus-timer-display" id="focus-timer-digits">25:00</div>
+
+      <div class="focus-timer-presets">
+        <button class="timer-preset-btn" onclick="app.setFocusTimerPreset(2)">2m Sprint</button>
+        <button class="timer-preset-btn" onclick="app.setFocusTimerPreset(5)">5m Quick</button>
+        <button class="timer-preset-btn" onclick="app.setFocusTimerPreset(15)">15m</button>
+        <button class="timer-preset-btn active" onclick="app.setFocusTimerPreset(25)">25m Pomodoro</button>
+        <button class="timer-preset-btn" onclick="app.setFocusTimerPreset('countup')">🚀 Just Start (Count Up)</button>
+      </div>
+
+      <div class="focus-task-card">
+        <h2 style="font-size: 1.4rem; font-weight: 800;" id="focus-task-title">Task Title</h2>
+        <p style="font-size: 0.92rem; color: var(--text-secondary);" id="focus-task-desc">Task description...</p>
+
+        <!-- Micro First Step Box -->
+        <div class="focus-first-step-box">
+          <strong style="color: var(--accent-color);">👉 Immediate Next Step:</strong>
+          <span id="focus-first-step-text">Open the file or look at the materials.</span>
+        </div>
+
+        <!-- Subtasks list in focus HUD -->
+        <div id="focus-subtasks-container" style="display: flex; flex-direction: column; gap: 8px;"></div>
+      </div>
+
+      <!-- Controls -->
+      <div class="focus-controls-row">
+        <button class="btn-primary" id="focus-timer-toggle-btn" style="padding: 12px 24px; font-size: 1rem;" onclick="app.toggleFocusTimer()">
+          ▶ Start Timer
+        </button>
+        <button class="btn-primary" style="background: var(--color-success); padding: 12px 24px; font-size: 1rem;" onclick="app.completeFocusTask()">
+          ✓ Complete Quest
+        </button>
+        <button class="btn-secondary" style="padding: 12px 20px; font-size: 1rem; color: #fb7185; border-color: rgba(244, 63, 94, 0.4);" onclick="app.openUnstickModal(app.focusTaskId)">
+          🪄 I'm Stuck
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODALS ==================== -->
+
+  <!-- 1. Task Editor / Creator Modal -->
+  <div class="modal-backdrop" id="modal-task-editor">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="modal-title" id="task-editor-modal-title">📝 Create Task</div>
+        <button class="modal-close-btn" onclick="app.closeModal('modal-task-editor')">✕</button>
+      </div>
+      <div class="modal-body">
+        <form id="task-editor-form" onsubmit="event.preventDefault(); app.saveTaskEditorForm();">
+          <input type="hidden" id="task-edit-id">
+
+          <div class="form-group">
+            <label class="form-label">Task Title *</label>
+            <input type="text" id="task-edit-title" class="form-input" placeholder="e.g. Reply to dentist confirmation" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Description / Context (Optional)</label>
+            <textarea id="task-edit-desc" class="form-textarea" rows="2" placeholder="Key details or instructions..."></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">👉 Micro First Step (Helps overcome starting friction)</label>
+            <input type="text" id="task-edit-firststep" class="form-input" placeholder="e.g. Open messages app, type 1 sentence">
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Category / Skill</label>
+              <select id="task-edit-category" class="form-select">
+                <option value="Life Admin">💰 Life Admin &amp; Finance</option>
+                <option value="Focus">🧠 Focus &amp; Deep Work</option>
+                <option value="Maintenance">🧹 Maintenance &amp; Reset</option>
+                <option value="Health">💪 Health &amp; Body</option>
+                <option value="Home">🏠 Home &amp; Sanctuary</option>
+                <option value="Work">💼 Work &amp; Career</option>
+                <option value="Learning">📚 Learning &amp; Curiosity</option>
+                <option value="Creativity">🎨 Creativity &amp; Play</option>
+                <option value="Personal Growth">🌱 Personal Growth</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Icon (Emoji or URL)</label>
+              <input type="text" id="task-edit-icon" class="form-input" value="📝" placeholder="Emoji (e.g. 🧹) or Image URL">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Estimated Duration</label>
+              <select id="task-edit-mins" class="form-select">
+                <option value="2">2 minutes (Tiny Win)</option>
+                <option value="5">5 minutes (Quick)</option>
+                <option value="10" selected>10 minutes</option>
+                <option value="15">15 minutes</option>
+                <option value="25">25 minutes (Pomodoro)</option>
+                <option value="45">45 minutes</option>
+                <option value="60">60+ minutes (Deep Dive)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Energy Demand</label>
+              <select id="task-edit-energy" class="form-select">
+                <option value="low">🪫 Low Battery (Easy win)</option>
+                <option value="limited">🔋 Limited Capacity</option>
+                <option value="normal" selected>⚡ Normal Energy</option>
+                <option value="high">🚀 High Energy / Complex</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Priority</label>
+              <select id="task-edit-priority" class="form-select">
+                <option value="low">Low (When I feel like it)</option>
+                <option value="normal" selected>Normal</option>
+                <option value="high">High</option>
+                <option value="urgent">Urgent</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Deadline Type</label>
+              <select id="task-edit-deadlinetype" class="form-select">
+                <option value="none">None (Flexible)</option>
+                <option value="soft">Soft Target ("Aim for")</option>
+                <option value="hard">Hard Deadline ("Must happen")</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Target / Deadline Date</label>
+              <input type="date" id="task-edit-deadlinedate" class="form-input">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Time (Optional)</label>
+              <input type="time" id="task-edit-deadlinetime" class="form-input">
+            </div>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 8px; margin-top: 6px;">
+            <input type="checkbox" id="task-edit-someday">
+            <label for="task-edit-someday" style="font-size: 0.88rem; color: var(--text-secondary);">
+              🛋️ Save to <strong>Someday / Maybe</strong> (No pressure, stays out of Today list)
+            </label>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary" onclick="app.closeModal('modal-task-editor')">Cancel</button>
+        <button type="button" class="btn-primary" onclick="app.saveTaskEditorForm()">Save Task</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. "I'm Stuck" Modal -->
+  <div class="modal-backdrop" id="modal-unstick">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="modal-title">🪄 Unstick Sanctuary</div>
+        <button class="modal-close-btn" onclick="app.closeModal('modal-unstick')">✕</button>
+      </div>
+      <div class="modal-body" id="unstick-modal-body">
+        <!-- Injected dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Reschedule Modal -->
+  <div class="modal-backdrop" id="modal-reschedule">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="modal-title">📅 Gentle Reschedule</div>
+        <button class="modal-close-btn" onclick="app.closeModal('modal-reschedule')">✕</button>
+      </div>
+      <div class="modal-body" id="reschedule-modal-body">
+        <!-- Injected dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. Capacity Picker Modal -->
+  <div class="modal-backdrop" id="modal-capacity-picker">
+    <div class="modal-dialog" style="max-width: 460px;">
+      <div class="modal-header">
+        <div class="modal-title">🔋 Select Current Capacity</div>
+        <button class="modal-close-btn" onclick="app.closeModal('modal-capacity-picker')">✕</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 0.85rem; color: var(--text-muted);">
+          Your energy naturally fluctuates. Select how you're feeling right now, and the dashboard will adapt task recommendations:
+        </p>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <button class="unstick-card" onclick="app.setCapacity('low'); app.closeModal('modal-capacity-picker');">
+            <div>
+              <strong>🪫 Low Battery (0–20%)</strong>
+              <div style="font-size: 0.78rem; color: var(--text-muted);">Shows 2–5 min micro tasks &amp; maintenance only.</div>
+            </div>
+          </button>
+          <button class="unstick-card" onclick="app.setCapacity('limited'); app.closeModal('modal-capacity-picker');">
+            <div>
+              <strong>🔋 Limited (20–40%)</strong>
+              <div style="font-size: 0.78rem; color: var(--text-muted);">Routine essentials + low cognitive load items.</div>
+            </div>
+          </button>
+          <button class="unstick-card" onclick="app.setCapacity('normal'); app.closeModal('modal-capacity-picker');">
+            <div>
+              <strong>⚡ Normal Capacity (40–70%)</strong>
+              <div style="font-size: 0.78rem; color: var(--text-muted);">Balanced mix of Today's Must/Should tasks.</div>
+            </div>
+          </button>
+          <button class="unstick-card" onclick="app.setCapacity('high'); app.closeModal('modal-capacity-picker');">
+            <div>
+              <strong>🚀 High Energy (70–90%)</strong>
+              <div style="font-size: 0.78rem; color: var(--text-muted);">Unlocks project milestones &amp; deep work quests.</div>
+            </div>
+          </button>
+          <button class="unstick-card" onclick="app.setCapacity('hyperfocus'); app.closeModal('modal-capacity-picker');">
+            <div>
+              <strong>🔮 Hyperfocus (90–100%)</strong>
+              <div style="font-size: 0.78rem; color: var(--text-muted);">Distraction-free single task + gentle hydration reminders.</div>
+            </div>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. Rapid Brain Dump Modal -->
+  <div class="modal-backdrop" id="modal-brain-dump">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="modal-title">🧠 Rapid Brain Dump</div>
+        <button class="modal-close-btn" onclick="app.closeModal('modal-brain-dump')">✕</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 0.85rem; color: var(--text-muted);">
+          Dump your thoughts, worries, reminders or random ideas. One per line.
+        </p>
+        <textarea id="modal-bd-text" class="form-textarea" rows="5" placeholder="• Remember to message Mom&#10;• Check electric bill&#10;• Cool idea for a drawing"></textarea>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="app.closeModal('modal-brain-dump')">Cancel</button>
+        <button class="btn-primary" onclick="
+          const t = document.getElementById('modal-bd-text');
+          if(t && t.value.trim()){
+            app.store.addBrainDump(t.value);
+            t.value = '';
+            app.closeModal('modal-brain-dump');
+            app.showToast('Offloaded to Inbox!');
+            app.renderCurrentView();
+          }
+        ">Save to Inbox</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. Journal Reflection Editor Modal -->
+  <div class="modal-backdrop" id="modal-journal-editor">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="modal-title">📓 Write Reflection</div>
+        <button class="modal-close-btn" onclick="app.closeModal('modal-journal-editor')">✕</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="journal-edit-prompt">
+        <div class="form-group">
+          <label class="form-label">Title / Theme</label>
+          <input type="text" id="journal-edit-title" class="form-input" placeholder="e.g. Morning thoughts or Post-task reset">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Current Mood</label>
+            <select id="journal-edit-mood" class="form-select">
+              <option value="calm">😌 Calm</option>
+              <option value="happy">😊 Happy</option>
+              <option value="tired">😴 Low Energy</option>
+              <option value="overwhelmed">🌊 Overwhelmed</option>
+              <option value="foggy">🌫️ Brain Fog</option>
+              <option value="focused">🎯 Focused</option>
+              <option value="proud">🌟 Proud</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Energy Rating (1–5)</label>
+            <select id="journal-edit-energy" class="form-select">
+              <option value="1">🔋 1/5 (Depleted)</option>
+              <option value="2">🔋 2/5 (Low)</option>
+              <option value="3" selected>🔋 3/5 (Moderate)</option>
+              <option value="4">🔋 4/5 (Good)</option>
+              <option value="5">🔋 5/5 (Peak)</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Reflection Content</label>
+          <textarea id="journal-edit-content" class="form-textarea" rows="5" placeholder="How did today feel? What was one small thing that went well?"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="app.closeModal('modal-journal-editor')">Cancel</button>
+        <button class="btn-primary" onclick="app.saveJournalEntryForm()">Save Reflection (+25 XP)</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- COMMAND PALETTE (CTRL+K) -->
+  <div id="command-palette" onclick="if(event.target===this) app.closeAllModals();">
+    <div class="palette-box">
+      <div class="palette-input-wrap">
+        <span style="font-size: 1.1rem; color: var(--text-muted);">🔍</span>
+        <input type="text" id="palette-search-input" class="palette-input" placeholder="Type a command, search tasks, or switch views..." oninput="app.filterPaletteResults(this.value)">
+        <span style="font-size: 0.75rem; color: var(--text-muted); background: var(--bg-secondary); padding: 2px 6px; border-radius: 4px;">ESC</span>
+      </div>
+      <div class="palette-results" id="palette-results-list"></div>
+    </div>
+  </div>
+
+  <!-- TOAST CONTAINER -->
+  <div id="toast-container" aria-live="polite"></div>
+
+  <!-- CONFETTI CANVAS -->
+  <canvas id="confetti-canvas"></canvas>
+
+  <!-- APPLICATION SCRIPTS -->
+  <script src="js/audio.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/engine.js"></script>
+  <script src="js/components.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
