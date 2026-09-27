@@ -29,7 +29,7 @@ const ACHIEVEMENTS_LIST = [
   { id: 'chaos_tamer', title: 'Chaos Tamer', desc: 'Reschedule or adjust an overdue task instead of feeling guilty.', icon: '🛡️', xp: 80 },
   { id: 'deep_diver', title: 'Deep Diver', desc: 'Complete a focused session of 25+ minutes.', icon: '🌊', xp: 120 },
   { id: 'routine_builder', title: 'Gentle Routine', desc: 'Complete an essential routine 3 times.', icon: '🔄', xp: 100 },
-  { id: 'stuck_breaker', title: 'Gentle Unstick', desc: 'Use the "I\'m Stuck" button to make a task smaller and finish it.', icon: '🪄', xp: 90 },
+  { id: 'stuck_breaker', title: 'Gentle Unstick', desc: 'Use the "I\'m Stuck" button to unstick a task and finish it.', icon: '🪄', xp: 90 },
   { id: 'brain_dumper', title: 'Mind Liberator', desc: 'Offload thoughts with the Brain Dump tool.', icon: '🧠', xp: 60 },
   { id: 'someday_sanctuary', title: 'Impulse Protector', desc: 'Save a shiny new idea into the Idea Vault without pressure.', icon: '💡', xp: 50 },
   { id: 'journal_reflector', title: 'Inner Mirror', desc: 'Write a calm journal entry with mood/energy check-in.', icon: '📓', xp: 75 },
@@ -896,6 +896,62 @@ class AppStore {
     return routine.items;
   }
 
+  deleteRoutine(routineId) {
+    const idx = this.state.routines.findIndex(r => r.id === routineId);
+    if (idx === -1) return null;
+    const [deleted] = this.state.routines.splice(idx, 1);
+    this.pushUndo(`Deleted routine "${deleted.title}"`, () => {
+      this.state.routines.splice(idx, 0, deleted);
+    });
+    this.save();
+    return deleted;
+  }
+
+  deleteRoutineItem(routineId, itemId) {
+    const routine = this.state.routines.find(r => r.id === routineId);
+    if (!routine) return null;
+    const idx = routine.items.findIndex(i => i.id === itemId);
+    if (idx === -1) return null;
+    const [deleted] = routine.items.splice(idx, 1);
+    this.pushUndo(`Removed routine step "${deleted.title}"`, () => {
+      routine.items.splice(idx, 0, deleted);
+    });
+    this.save();
+    return deleted;
+  }
+
+  addRoutine(routineData) {
+    const id = routineData.id || this.generateId('routine');
+    const newRoutine = {
+      id,
+      title: routineData.title?.trim() || 'New Routine',
+      timeOfDay: routineData.timeOfDay || 'morning',
+      icon: routineData.icon || '☀️',
+      color: routineData.color || '#f59e0b',
+      activeTier: routineData.activeTier || 'short',
+      items: Array.isArray(routineData.items) ? routineData.items : [],
+      completedDays: []
+    };
+    this.state.routines.push(newRoutine);
+    this.save();
+    return newRoutine;
+  }
+
+  addRoutineItem(routineId, itemTitle, estimatedMinutes = 2, isCrucial = false) {
+    const routine = this.state.routines.find(r => r.id === routineId);
+    if (!routine) return null;
+    const newItem = {
+      id: this.generateId('ritem'),
+      title: itemTitle.trim(),
+      estimatedMinutes: Number(estimatedMinutes) || 2,
+      isCrucial: Boolean(isCrucial),
+      completedToday: false
+    };
+    routine.items.push(newItem);
+    this.save();
+    return newItem;
+  }
+
   // ==================== JOURNAL ====================
 
   addJournalEntry(entryData) {
@@ -1038,6 +1094,17 @@ class AppStore {
     this.state.projects.unshift(proj);
     this.save();
     return proj;
+  }
+
+  deleteProject(projectId) {
+    const idx = this.state.projects.findIndex(p => p.id === projectId);
+    if (idx === -1) return null;
+    const [deleted] = this.state.projects.splice(idx, 1);
+    this.pushUndo(`Deleted project "${deleted.title}"`, () => {
+      this.state.projects.splice(idx, 0, deleted);
+    });
+    this.save();
+    return deleted;
   }
 
   // ==================== SETTINGS & DATA EXPORT ====================

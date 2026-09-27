@@ -160,10 +160,6 @@ class UIComponents {
                   <span>🎲</span>
                   <span>Pick Something Else</span>
                 </button>
-                <button class="btn-secondary" onclick="app.openUnstickModal('${oracle.task.id}')">
-                  <span>🪄</span>
-                  <span>Make It Smaller</span>
-                </button>
               </div>
             </div>
           ` : `
@@ -270,6 +266,9 @@ class UIComponents {
             <div class="widget-card">
               <div class="widget-header">
                 <span class="widget-title">☀️ Daily Routines</span>
+                <button class="btn-secondary" style="padding: 2px 8px; font-size: 0.72rem;" onclick="app.openRoutineEditor()">
+                  + Routine
+                </button>
               </div>
               ${state.routines.map(r => this.renderRoutineWidget(r)).join('')}
             </div>
@@ -326,9 +325,14 @@ class UIComponents {
             ✓
           </button>
           <div class="task-content-area">
-            <div class="task-header-line">
-              ${this.renderTaskIcon(task)}
-              <span class="task-card-title">${this.escapeHtml(task.title)}</span>
+            <div class="task-header-line" style="display: flex; justify-content: space-between; align-items: flex-start;">
+              <div style="display: flex; align-items: center; gap: 8px; flex: 1;">
+                ${this.renderTaskIcon(task)}
+                <span class="task-card-title">${this.escapeHtml(task.title)}</span>
+              </div>
+              <button class="task-delete-corner-btn" onclick="app.deleteTask('${task.id}')" title="Delete Task" aria-label="Delete Task">
+                🗑️
+              </button>
             </div>
 
             ${task.description ? `<p class="task-card-desc">${this.escapeHtml(task.description)}</p>` : ''}
@@ -390,13 +394,16 @@ class UIComponents {
                 <button class="task-action-btn" onclick="app.openTaskEditor('${task.id}')">
                   <span>✏️</span> <span>Edit</span>
                 </button>
+                <button class="task-action-btn btn-delete" onclick="app.deleteTask('${task.id}')" title="Delete Task">
+                  <span>🗑️</span> <span>Delete</span>
+                </button>
               </div>
             ` : `
               <div class="task-card-actions">
                 <button class="task-action-btn" onclick="app.openTaskEditor('${task.id}')">
                   <span>✏️</span> <span>Details</span>
                 </button>
-                <button class="task-action-btn" onclick="app.deleteTask('${task.id}')">
+                <button class="task-action-btn btn-delete" onclick="app.deleteTask('${task.id}')">
                   <span>🗑️</span> <span>Delete</span>
                 </button>
               </div>
@@ -571,7 +578,10 @@ class UIComponents {
                     <h3 style="font-size: 1.1rem; font-weight: 700;">${p.icon || '📁'} ${this.escapeHtml(p.title)}</h3>
                     <p style="font-size: 0.82rem; color: var(--text-muted); margin-top: 2px;">${this.escapeHtml(p.description)}</p>
                   </div>
-                  <span class="badge badge-category">${p.category}</span>
+                  <div style="display: flex; align-items: center; gap: 6px;">
+                    <span class="badge badge-category">${p.category}</span>
+                    <button class="project-del-btn" onclick="app.deleteProject('${p.id}')" title="Delete Project">🗑️</button>
+                  </div>
                 </div>
 
                 <div class="xp-progress-bar-container">
@@ -593,12 +603,33 @@ class UIComponents {
                   `).join('')}
                 </div>
 
-                <button class="btn-secondary" style="width: 100%; justify-content: center; font-size: 0.82rem;" onclick="app.openTaskEditor(null, null, '${p.id}')">
-                  + Add task to this project
-                </button>
+                <div style="display: flex; gap: 8px; margin-top: 4px;">
+                  <button class="btn-secondary" style="flex: 1; justify-content: center; font-size: 0.82rem;" onclick="app.openTaskEditor(null, null, '${p.id}')">
+                    + Add task
+                  </button>
+                  <button class="btn-secondary" style="color: #fda4af; border-color: rgba(244, 63, 94, 0.3); font-size: 0.82rem; padding: 6px 12px;" onclick="app.deleteProject('${p.id}')" title="Delete Project">
+                    🗑️ Delete
+                  </button>
+                </div>
               </div>
             `;
           }).join('')}
+        </div>
+
+        <!-- Routines Section in Projects & Routines View -->
+        <div style="margin-top: 20px; display: flex; flex-direction: column; gap: 14px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <h2 style="font-size: 1.25rem; font-weight: 700;">☀️ Habit Routines (${state.routines.length})</h2>
+              <p style="font-size: 0.82rem; color: var(--text-muted);">Manage step-by-step rituals with Full, Short, or Minimum Viable tiers.</p>
+            </div>
+            <button class="btn-secondary" onclick="app.openRoutineEditor()">
+              <span>+</span> <span>New Routine</span>
+            </button>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px;">
+            ${state.routines.map(r => this.renderRoutineWidget(r)).join('')}
+          </div>
         </div>
       </div>
     `;
@@ -995,7 +1026,10 @@ class UIComponents {
     return `
       <div style="background: var(--bg-secondary); border-radius: var(--radius-md); padding: 12px; display: flex; flex-direction: column; gap: 8px;">
         <div style="display: flex; justify-content: space-between; align-items: center;">
-          <span style="font-size: 0.88rem; font-weight: 700;">${routine.icon} ${this.escapeHtml(routine.title)}</span>
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <span style="font-size: 0.88rem; font-weight: 700;">${routine.icon} ${this.escapeHtml(routine.title)}</span>
+            <button class="routine-del-btn" onclick="app.deleteRoutine('${routine.id}')" title="Delete Routine">🗑️</button>
+          </div>
           <div class="routine-tier-pills">
             <button class="tier-pill ${routine.activeTier === 'minimum' ? 'active' : ''}" onclick="app.setRoutineTier('${routine.id}', 'minimum')">Min</button>
             <button class="tier-pill ${routine.activeTier === 'short' ? 'active' : ''}" onclick="app.setRoutineTier('${routine.id}', 'short')">Short</button>
@@ -1005,15 +1039,25 @@ class UIComponents {
 
         <div class="routine-items-list">
           ${activeItems.map(item => `
-            <div class="routine-item-row ${item.completedToday ? 'is-done' : ''}" onclick="app.toggleRoutineItem('${routine.id}', '${item.id}')">
-              <span style="display: flex; align-items: center; gap: 6px;">
+            <div class="routine-item-row ${item.completedToday ? 'is-done' : ''}">
+              <div style="display: flex; align-items: center; gap: 6px; flex: 1; cursor: pointer;" onclick="app.toggleRoutineItem('${routine.id}', '${item.id}')">
                 <span>${item.completedToday ? '✓' : '○'}</span>
                 <span>${this.escapeHtml(item.title)}</span>
-              </span>
-              <span style="font-size: 0.72rem; color: var(--text-muted);">${item.estimatedMinutes}m</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <span style="font-size: 0.72rem; color: var(--text-muted);">${item.estimatedMinutes}m</span>
+                <button class="routine-item-del-btn" onclick="event.stopPropagation(); app.deleteRoutineItem('${routine.id}', '${item.id}')" title="Remove Step">✕</button>
+              </div>
             </div>
           `).join('')}
+          ${activeItems.length === 0 ? `
+            <p style="font-size: 0.75rem; color: var(--text-muted); text-align: center; padding: 4px;">No steps in this tier.</p>
+          ` : ''}
         </div>
+
+        <button class="btn-secondary" style="font-size: 0.72rem; padding: 4px; justify-content: center; width: 100%;" onclick="app.addRoutineItemPrompt('${routine.id}')">
+          + Add Step
+        </button>
       </div>
     `;
   }

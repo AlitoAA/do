@@ -463,6 +463,50 @@ class DashboardApp {
     this.renderCurrentView();
   }
 
+  deleteRoutine(routineId) {
+    if (confirm('Delete this routine?')) {
+      this.store.deleteRoutine(routineId);
+      this.audio.play('click');
+      this.showToast('Routine deleted', 'info', true);
+      this.renderCurrentView();
+    }
+  }
+
+  deleteRoutineItem(routineId, itemId) {
+    this.store.deleteRoutineItem(routineId, itemId);
+    this.audio.play('click');
+    this.showToast('Step removed from routine', 'info', true);
+    this.renderCurrentView();
+  }
+
+  addRoutineItemPrompt(routineId) {
+    const title = prompt('Enter step title (e.g. Drink glass of water, Quick stretch):');
+    if (!title || !title.trim()) return;
+    const mins = prompt('Estimated minutes (e.g. 1, 2, 5):', '2') || '2';
+    const isCrucial = confirm('Is this step crucial for Minimum Viable Routine?');
+    this.store.addRoutineItem(routineId, title.trim(), parseInt(mins, 10) || 2, isCrucial);
+    this.audio.play('complete');
+    this.showToast('Step added to routine!');
+    this.renderCurrentView();
+  }
+
+  openRoutineEditor() {
+    const title = prompt('Routine name (e.g. Morning Kickstart, Work Shutdown, Bedtime Reset):');
+    if (!title || !title.trim()) return;
+    const timeOfDay = prompt('Time of day (morning, afternoon, evening, anytime):', 'morning') || 'morning';
+    const icon = prompt('Routine emoji icon (e.g. ☀️, 🌙, 💼, ☕):', '☀️') || '☀️';
+
+    this.store.addRoutine({
+      title: title.trim(),
+      timeOfDay: timeOfDay.trim(),
+      icon: icon.trim(),
+      items: []
+    });
+    this.audio.play('complete');
+    this.showToast(`Routine "${title}" created!`);
+    this.renderCurrentView();
+  }
+
   // ==================== BRAIN DUMP & IMPULSE IDEAS ====================
 
   quickAddIdea() {
@@ -542,6 +586,15 @@ class DashboardApp {
     this.renderCurrentView();
   }
 
+  deleteProject(id) {
+    if (confirm('Delete this project?')) {
+      this.store.deleteProject(id);
+      this.audio.play('click');
+      this.showToast('Project deleted', 'info', true);
+      this.renderCurrentView();
+    }
+  }
+
   // ==================== QUICK ADD (NLP) ====================
 
   submitQuickAdd() {
@@ -587,7 +640,20 @@ class DashboardApp {
     document.getElementById('task-edit-someday').checked = task ? Boolean(task.isSomeday) : false;
     document.getElementById('task-edit-icon').value = task ? (task.icon || '📝') : '📝';
 
+    const delBtn = document.getElementById('task-edit-delete-btn');
+    if (delBtn) {
+      delBtn.style.display = isEdit ? 'inline-flex' : 'none';
+    }
+
     this.openModal('modal-task-editor');
+  }
+
+  deleteTaskFromEditor() {
+    const id = document.getElementById('task-edit-id').value;
+    if (id) {
+      this.deleteTask(id);
+      this.closeModal('modal-task-editor');
+    }
   }
 
   saveTaskEditorForm() {

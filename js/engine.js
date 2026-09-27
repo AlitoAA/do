@@ -617,7 +617,7 @@ class AuDHDEngine {
           `Done.`
         ],
         stuck: [
-          `Make it smaller.`
+          `Take a breath and pause.`
         ]
       }
     };
